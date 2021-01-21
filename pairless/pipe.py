@@ -89,7 +89,7 @@ def join(lst: list, sep="\t") -> str:
 
 
 @pipe
-def mget(obj, keys=[], default=None):
+def mget(obj, keys: List[str] = [], default=None):
     rst = []
     for key in keys:
         rst.append(obj.get(key, default))
@@ -97,7 +97,17 @@ def mget(obj, keys=[], default=None):
 
 
 @pipe
-def trim(data):
+def get_key_or_key(obj, keys: List[str] = [], default=None):
+    rst = default
+    for key in keys:
+        rst = obj.get(key, None) or rst
+        if rst != default:
+            break
+    return rst
+
+
+@pipe
+def trim(data: str):
     return data.replace('"', "").replace("'", "").strip(" ")
 
 
