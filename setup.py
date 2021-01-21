@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pairless',  # 包名
-    version='0.0.7',  # 版本号
+    version='0.0.8',  # 版本号
     description=
     ('use >> replace pair ,such as `group_by_slice(lst,2)  lst>>group_by_slice(2)`'
      ),  # 简介

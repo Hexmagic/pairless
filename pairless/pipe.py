@@ -1,9 +1,10 @@
 import functools
 import json
 import random
+import math
 from collections import defaultdict
 from hashlib import md5
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, List, Match, Set, Tuple, Union
 
 
 class Monad(str):
@@ -89,9 +90,9 @@ def join(lst: list, sep="\t") -> str:
 
 
 @pipe
-def mget(obj, keys: List[str] = [], default=None):
+def mkey(obj, default=None, *args):
     rst = []
-    for key in keys:
+    for key in args:
         rst.append(obj.get(key, default))
     return rst
 
@@ -107,7 +108,12 @@ def get_key_or_key(obj, keys: List[str] = [], default=None):
 
 
 @pipe
-def trim(data: str):
+def mindex(lst, *args):
+    return [lst[i] for i in args]
+
+
+@pipe
+def trim(data):
     return data.replace('"', "").replace("'", "").strip(" ")
 
 
@@ -118,7 +124,7 @@ def group_by_range(lst, s=3, e=None):
     rtn = []
     if not e:
         # 均分
-        return lst >> group_by_slice(s)
+        return lst >> group_by_n(s)
     else:
         # 在一定范围内均分
         i = 0
@@ -142,15 +148,32 @@ def group_by_key(lst: List[Dict], key: str = "") -> Dict[str, List]:
 
 
 @pipe
-def group_by_slice(lst, count=4):
+def group_by_n(lst, count=4):
     '''
         [1,2,3,4,5,6,7,8]
-            >>slice_into_n(3)
-        =>[[1,2,3],[4,5,6],[7,8]]
+            >>group_by_n(2)
+        =>[[1,2],[3,4],[5,6],[7,8]]
     '''
     rtn = []
     for i in range(0, len(lst), count):
         rtn.append(lst[i:i + count])
+    return rtn
+
+
+@pipe
+def group_into_n(lst, count):
+    '''
+    [1,2,3,4,5,6,7,8]
+            >>group_into_n(2)
+        =>[[1,2,3,4],[5,6,7,8]]
+    '''
+    rtn = []
+    elen = math.ceil(len(lst) / count)
+    s = i = 0
+    while i < count:
+        rtn.append(lst[s:s + elen])
+        i += 1
+        s = s + elen
     return rtn
 
 
@@ -232,7 +255,8 @@ def to_md5(data) -> int:
 def main():
     lst = ["ac", "ac"] >= pipe(str.replace)("a", "c")
     print(lst)
-    a = list(range(30))
+    lst = ['1', '2', '3', '4', '5'] >> mindex(1, 2, 3) >= to_int
+    print(lst)
 
 
 if __name__ == "__main__":
