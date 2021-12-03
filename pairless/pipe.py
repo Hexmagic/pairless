@@ -1,17 +1,18 @@
+# encoding:utf8
 import functools
 import json
 import random
 import math
 from collections import defaultdict
 from hashlib import md5
-from typing import Any, Dict, List, Match, Set, Tuple, Union
+
 
 
 class pipe(object):
     def __init__(self, function):
         self.function = function
         self.rst = None
-        functools.update_wrapper(self, function)
+        #functools.update_wrapper(self, function)
 
     def __rrshift__(self, other):
         return self.function(other)
@@ -28,27 +29,31 @@ class pipe(object):
 
 
 @pipe
-def to_list(data: Union[List, str, Tuple, Set]):
+def to_list(data):
+    ''': Union[List, str, Tuple, Set]'''
     return list(data)
 
 
 @pipe
-def to_int(data: Union[int, str, float]):
+def to_int(data):
+    ''': Union[int, str, float]'''
     return int(data)
 
 
 @pipe
-def to_dict(data: Union[List[Tuple], Dict]):
+def to_dict(data):
+    ''': Union[List[Tuple], Dict]'''
     return dict(data)
 
 
 @pipe
-def to_float(data: Union[int, float, str]):
+def to_float(data):
+    ''': Union[int, float, str]'''
     return float(data)
 
 
 @pipe
-def to_bool(data: Any):
+def to_bool(data):
     return bool(data)
 
 
@@ -58,7 +63,7 @@ def to_str(obj):
 
 
 @pipe
-def join(lst: list, sep="\t") -> str:
+def join(lst, sep="\t"):
     return sep.join(list(map(str, lst)))
 
 
@@ -71,7 +76,7 @@ def mkey(obj, default=None, *args):
 
 
 @pipe
-def get_key_or_key(obj, keys: List[str] = [], default=None):
+def get_key_or_key(obj, keys= [], default=None):
     rst = default
     for key in keys:
         rst = obj.get(key, None) or rst
@@ -109,7 +114,7 @@ def group_by_range(lst, s=3, e=None):
 
 
 @pipe
-def group_by_key(lst: List[Dict], key: str = "") -> Dict[str, List]:
+def group_by_key(lst, key = ""):
     group = defaultdict(list)
     for ele in lst:
         if isinstance(ele, dict):
@@ -141,7 +146,7 @@ def group_into_n(lst, count):
         =>[[1,2,3,4],[5,6,7,8]]
     '''
     rtn = []
-    elen = math.ceil(len(lst) / count)
+    elen = math.ceil(len(lst) / count)>>to_int
     s = i = 0
     while i < count:
         rtn.append(lst[s:s + elen])
@@ -170,7 +175,7 @@ def group_by_sep(lst, sep=None):
 
 
 @pipe
-def head(lst: list, default=""):
+def head(lst, default=""):
     try:
         return lst[0]
     except Exception:
@@ -178,19 +183,19 @@ def head(lst: list, default=""):
 
 
 @pipe
-def json_to_str(data: dict):
+def json_to_str(data):
     return json.dumps(data, ensure_ascii=False)
 
 
 @pipe
-def mreplace(src: str, lstb: list, b="") -> str:
+def mreplace(src, lstb, b=""):
     for ele in lstb:
         src = src.replace(ele, b)
     return src
 
 
 @pipe
-def to_json(data: Union[str, bytes], encoding="utf8") -> dict:
+def to_json(data, encoding="utf8"):
     # 替换字符中含有的双引号
     if isinstance(data, bytes):
         data = data.decode(encoding)
@@ -217,7 +222,7 @@ def strip_group(data, trim):
 
 
 @pipe
-def to_md5(data) -> int:
+def to_md5(data):
     if isinstance(data, list):
         data = "".join(data)
     md = md5()
@@ -230,6 +235,9 @@ def main():
     print(lst)
     lst = ['1', '2', '3', '4', '5'] >> mindex(1, 2, 3) >= to_int
     print(lst)
+    for ele in (range(100)>>to_list>>group_into_n(10)):
+        print(ele)
+
 
 
 if __name__ == "__main__":
