@@ -7,33 +7,6 @@ from hashlib import md5
 from typing import Any, Dict, List, Match, Set, Tuple, Union
 
 
-class Monad(str):
-    def __init__(self, data):
-        self.data = data
-        str.__init__(self)
-
-    def __getitem__(self, attr):
-        try:
-            return Monad(self.data[attr])
-        except Exception:
-            return Monad("")
-
-    def __repr__(self):
-        if not self.data:
-            return ""
-        else:
-            return self.data >> to_json
-
-
-def monad(func):
-    @functools.wraps(func)
-    async def inner(*args, **kwargs):
-        rst = await func(*args, **kwargs)
-        return Monad(rst)
-
-    return inner
-
-
 class pipe(object):
     def __init__(self, function):
         self.function = function
